@@ -1,0 +1,33 @@
+#include <IRremote.h>
+#define irPin 10
+IRrecv irrecv(irPin);
+decode_results results;
+int dioda = 3;
+int button = 0;
+void setup() {                
+  pinMode(dioda, OUTPUT); 
+   Serial.begin(9600);
+   irrecv.enableIRIn();
+   
+}
+   
+void loop() {
+
+   if (irrecv.decode(&results)) {
+   
+      switch (results.value) {
+         case 0xE0E016E9:
+         if(button==0){
+           digitalWrite(dioda, HIGH);
+           button = 1;
+           delay(50);
+         } else {
+           digitalWrite(dioda, LOW);
+           button = 0;
+            delay(50);
+         } break;
+         
+         }
+   irrecv.resume();
+   }
+}
