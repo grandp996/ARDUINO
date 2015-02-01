@@ -1,0 +1,36 @@
+#include <IRremote.h>
+#define irPin 11
+IRrecv irrecv(irPin);
+decode_results results;
+int ledPin = 10;
+int ledLevel = 255;
+int switchPin = 8;
+bool statusLED = false;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(switchPin, INPUT);
+  Serial.begin(9600);
+  irrecv.enableIRIn();
+}
+
+void startLED(int ledLevel){
+ statusLED = true;
+ for(int level = 0; level<=ledLevel; level++){
+  analogWrite(ledPin, level);
+  delay(1);
+ } 
+}
+
+void loop() {
+if((digitalRead(switchPin)==HIGH || irrecv.decode(&results)) && !statusLED){
+ startLED(ledLevel);
+irrecv.resume();
+delay(500);
+} else if((digitalRead(switchPin)==HIGH || irrecv.decode(&results)) && statusLED){
+  digitalWrite(ledPin, LOW);
+  statusLED=false;
+  irrecv.resume();
+  delay(500);
+}
+}
