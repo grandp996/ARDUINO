@@ -1,0 +1,49 @@
+#include <IRremote.h>
+#define irPin 11
+IRrecv irrecv(irPin);
+decode_results results;
+int ledPin = 10;
+int ledLevel = 255;
+int switchPin = 8;
+bool statusLED = false;
+bool IR;
+String code = "e0e016e9"; 
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  pinMode(switchPin, INPUT);
+  Serial.begin(9600);
+  irrecv.enableIRIn();
+}
+
+void startLED(int ledLevel) {
+  statusLED = true;
+  for (int level = 0; level <= ledLevel; level++) {
+    analogWrite(ledPin, level);
+    delay(1);
+  }
+}
+
+bool ircode(String code){
+ bool test = false;
+ if(irrecv.decode(&results)){
+  if(code == String(results.value, HEX)) test = true;
+  delay(200);
+  irrecv.resume();
+ } 
+ return test;
+}
+
+void loop() {
+  IR = ircode(code);
+    if ((digitalRead(switchPin) == HIGH || IR) && !statusLED) {
+      startLED(ledLevel);
+      irrecv.resume();
+      delay(500);
+    } else if ((digitalRead(switchPin) == HIGH || IR) && statusLED) {
+      digitalWrite(ledPin, LOW);
+      statusLED = false;
+      irrecv.resume();
+      delay(500);
+    }
+  }# ARDUINO
